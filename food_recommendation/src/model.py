@@ -22,4 +22,4 @@ class Model:
         """
         Recommend a food
         """
-        return self.data[0]
+        return max({i: self.data.count(i) for i in range(1, 6)}.items(), key=lambda x: x[1])[0]

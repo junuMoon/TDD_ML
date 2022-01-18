@@ -33,6 +33,13 @@ def two_person_data():
     return {'Jason': [random.randint(1, 5) for _ in range(10)],
             'Kim': [random.randint(1, 5) for _ in range(10)]}
 
+def test_model_recommend_food(two_person_data):
+    """
+    Test the random selection of the food
+    """
+    model = Model(two_person_data)
+    assert type(model.recommend('Jason')) == str
+
 def test_model_recommend_most_common(two_person_data):
     """
     Test the recommendation of the most common food

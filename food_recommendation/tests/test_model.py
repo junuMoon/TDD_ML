@@ -3,24 +3,32 @@ import pytest
 import random
 
 @pytest.fixture
+def menu():
+    return ['pizza', 'pasta', 'burger', 'fries', 'chicken', 'sandwich']
+
+@pytest.fixture
+def model(menu):
+    return Model(menu=menu)
+
+@pytest.fixture
 def one_person_data():
     """
     Fixture for a one person data
     """
     return [random.randint(0, 5) for _ in range(5)]
 
-def test_model_recommend_food(one_person_data):
+def test_model_recommend_food(model, one_person_data):
     """
     Test the random selection of the food
     """
-    model = Model(one_person_data)
+    model.add_data(one_person_data)
     assert type(model.recommend()) == str
 
-def test_model_recommend_most_common(one_person_data):
+def test_model_recommend_most_common(model, one_person_data):
     """
     Test the recommendation of the most common food
     """
-    model = Model(one_person_data)
+    model.add_data(one_person_data)
     most_common = model.menu[max({i: one_person_data.count(i) for i in range(0, 5)}.items(), key=lambda x: x[1])[0] - 1]
     assert model.recommend() == most_common
 
@@ -37,19 +45,19 @@ def two_person_data():
 
     return data
 
-def test_model_recommend_food(two_person_data):
+def test_model_recommend_food(model, two_person_data):
     """
     Test the random selection of the food
     """
-    model = Model(two_person_data)
+    model.add_data(two_person_data)
     assert type(model.recommend('Jason')) == str
 
 @pytest.mark.xfail(reason="Need more parameters to attenuate the preference when there's few people")
-def test_model_recommend_most_common(two_person_data):
+def test_model_recommend_most_common(model, two_person_data):
     """
     Test the recommendation of the most common food
     """
-    model = Model(two_person_data)
+    model.add_data(two_person_data)
     assert model.recommend('Jason') == 'pasta'
     # When Two person is there, if one person choose a food one time,
     # The preference will be 1 / 1 = 1.0
@@ -86,19 +94,44 @@ def ten_people_data():
     return data
 
 @pytest.mark.skip(reason="Sigmoid time model applied")
-def test_model_recommend_his_favorite_menu(ten_people_data):
+def test_model_recommend_his_favorite_menu(model, ten_people_data):
     """
     Test model recommend his favorite menu
     favorite menu is calculated by the most common food / the number all people choice that menu
     """
-    model = Model(ten_people_data)
+    model.add_data(ten_people_data)
     assert model.recommend('Jason') == 'pasta'
 
-def test_model_not_recommend_the_last_eaten_menu(ten_people_data):
+def test_model_not_recommend_the_last_eaten_menu(model, ten_people_data):
     """
     Test model not recommend the last eaten menu
     """
-    model = Model(ten_people_data)
+    model.add_data(ten_people_data)
     print(model.preferences('Jason'))
     assert model.recommend('Jason') != 'pasta'
 
+@pytest.fixture
+def ten_people_after_data():
+    """
+    Fixture for a ten person data after 10 days
+    """
+    return  {'Jason': [random.randint(0, 5) for _ in range(10)],
+            'Kim': [random.randint(0, 5) for _ in range(10)],
+            'Linda': [random.randint(0, 5) for _ in range(10)],
+            'Mason': [random.randint(0, 5) for _ in range(10)],
+            'Nathan': [random.randint(0, 5) for _ in range(10)],
+            'Olivia': [random.randint(0, 5) for _ in range(10)],
+            'Pam': [random.randint(0, 5) for _ in range(10)],
+            'Quinn': [random.randint(0, 5) for _ in range(10)],
+            'Riley': [random.randint(0, 5) for _ in range(10)],
+            'Sam': [random.randint(0, 5) for _ in range(10)]}    
+
+
+def test_model_recalculate_preferences_with_data_added(model, ten_people_data, ten_people_after_data):
+    """
+    Test model recalculate preferences with data added
+    """
+    model.add_data(ten_people_data)
+    recommendation_after_10days = model.recommend('Jason')
+    model.add_data(ten_people_after_data)
+    assert model.recommend('Jason') != recommendation_after_10days

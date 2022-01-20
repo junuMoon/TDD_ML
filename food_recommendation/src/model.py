@@ -1,16 +1,16 @@
 from math import floor
-import numpy as np
-
-def sigmoid(x, scale=3):
-    return (1 / (1 + np.exp(-x))) * scale
+from src.utils import sigmoid
 
 class Model:
 
-    def __init__(self, data):
+    def __init__(self, menu, data=None):
         """
         Initialize the model
         """
-        self.menu = ['pizza', 'pasta', 'ramen', 'fried_rice', 'ttoeokbokki', 'jjiigae']
+        self.menu = menu
+        self.data = data if data else {}
+
+    def add_data(self, data):
         self.data = data
 
     def count_last_eaten(self, data, days=7):

@@ -12,7 +12,7 @@ class Model:
         return [item for sublist in self.data.values() for item in sublist]
 
     def count_menu(self, data):
-        return {i: data.count(i) for i in range(len(self.menu))}
+        return {menu: data.count(i) for i, menu in enumerate(self.menu) if data.count(i) > 0}
 
     def preferences(self, name):
         """
@@ -20,7 +20,8 @@ class Model:
         """
         all_menu_count = self.count_menu(self.flat_data)
         person_menu_count = self.count_menu(self.data[name])
-        return {i: person_menu_count[i] / all_menu_count[i] for i in range(len(self.menu))}
+        return {menu: person_menu_count.get(menu, 0) / one_menu_count \
+                for menu, one_menu_count in all_menu_count.items()}
 
     def recommend(self, name):
         """
@@ -29,4 +30,4 @@ class Model:
         assert name in self.data.keys(), \
             'The name is not in the data'
         preferences = self.preferences(name)
-        return self.menu[max(preferences.items(), key=lambda x: x[1])[0]]
+        return sorted(preferences.items(), key=lambda x: x[1], reverse=True)[0][0]

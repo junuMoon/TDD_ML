@@ -49,9 +49,11 @@ def test_model_recommend_most_common(two_person_data):
     Test the recommendation of the most common food
     """
     model = Model(two_person_data)
-    all_menu_count = model.count_menu(model.flat_data)
-    print(all_menu_count) # FIXME: ZeroDivisonError when any menu count is 0
+    print(model.preferences('Jason'))
     assert model.recommend('Jason') == 'pasta'
+    # When Two person is there, if one person choose a food one time,
+    # The preference will be 1 / 1 = 1.0
+    # Need more parameters to attenuate the preference
 
 @pytest.fixture
 def ten_people_data():
@@ -83,12 +85,10 @@ def ten_people_data():
 
     return data
 
-
 def test_model_recommend_his_favorite_menu(ten_people_data):
     """
     Test model recommend his favorite menu
     favorite menu is calculated by the most common food / the number all people choice that menu
     """
     model = Model(ten_people_data)
-    print(model.preferences('Jason'))
     assert model.recommend('Jason') == 'pasta'

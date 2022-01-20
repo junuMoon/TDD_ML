@@ -1,3 +1,9 @@
+from math import floor
+import numpy as np
+
+def sigmoid(x, scale=3):
+    return (1 / (1 + np.exp(-x))) * scale
+
 class Model:
 
     def __init__(self, data):
@@ -6,6 +12,20 @@ class Model:
         """
         self.menu = ['pizza', 'pasta', 'ramen', 'fried_rice', 'ttoeokbokki', 'jjiigae']
         self.data = data
+
+    def count_last_eaten(self, data, days=7):
+        """
+        Count the last eaten days
+        """
+        self.scale_num = floor(days/2)
+        data = data[:-days:-1]
+        count_days = {}
+        for i, menu in enumerate(self.menu):
+            try:
+                count_days[menu] = data.index(i) - self.scale_num
+            except ValueError:
+                count_days[menu] = days
+        return count_days
 
     @property
     def flat_data(self):
@@ -20,8 +40,10 @@ class Model:
         """
         all_menu_count = self.count_menu(self.flat_data)
         person_menu_count = self.count_menu(self.data[name])
-        return {menu: person_menu_count.get(menu, 0) / one_menu_count \
-                for menu, one_menu_count in all_menu_count.items()}
+        last_eaten_days = self.count_last_eaten(self.data[name])
+        return {menu: person_menu_count.get(menu, 0) * sigmoid(last_eaten_days[menu], self.scale_num) \
+                                                        / one_menu_count \
+                                for menu, one_menu_count in all_menu_count.items()}
 
     def recommend(self, name):
         """

@@ -205,4 +205,4 @@ cython_debug/
 .ionide
 
 # All test files
-*/test/
+*.csv

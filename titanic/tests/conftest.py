@@ -7,6 +7,10 @@ import pandas as pd
 path = Path(os.path.dirname(__file__))
 data_dir = path.absolute().parent / 'data'
 
+@pytest.fixture
+def cat_vars():
+    return ['Pclass', 'Sex', 'SibSp', 'Parch', 'Embarked']
+
 @pytest.fixture(scope='module')
 def train_data():
     return pd.read_csv(data_dir / 'train.csv')

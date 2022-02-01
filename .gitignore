@@ -206,3 +206,8 @@ cython_debug/
 
 # All test files
 *.csv
+*.iml
+*.xml
+
+.ipynb_checkpoints/
+test.py-*

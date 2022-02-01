@@ -115,10 +115,14 @@ Some children travelled only with a nanny, therefore parch=0 for them.
 ### Ticket 
 - Ticket data can divide into two group
     - Ticket has string -> survival rate: 0.38
-    - Ticket has no string -> survival rate: 0.38
+    - Ticket has no string -> survㅇㅁival rate: 0.38
     - No survival rate difference
 - length of Ticker number vary from (1, 3, 4, 5, 6, 7)
 - For now it's too complicated to group by Ticket, so drop this col
+
+### Name
+- Could extract title from Name
+- Survival Rates: Mrs(0.8) > Miss > Master > Unknown > Mr
 
 ### Comments
 

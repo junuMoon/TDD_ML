@@ -1,9 +1,4 @@
-import numpy as np
-import pandas as pd
-from copy import deepcopy
-
-CAT_VARS = ['Pclass', 'Sex', 'Embarked', 'Cabin', 'Alone', 'Title']
-NUM_VARS = ['Age', 'SibSp', 'Parch', 'Fare']
+from src import NUM_VARS, CAT_VARS
 
 def preprocess(df):
     # Categorical variables
@@ -12,14 +7,24 @@ def preprocess(df):
     for t in ['Mr', 'Miss', 'Mrs', 'Master']:
         df.loc[df['Name'].str.contains(t), 'Title'] = t
     
-    # Impute
-    df['Age'] = df['Age'].fillna(df.groupby(['Alone', 'Sex', 'Pclass'])['Age'].transform('mean'))
-    for var in NUM_VARS:
-        df[var] = df[var].fillna(df[var].mean())
-    for var in CAT_VARS:
-        df[var] = df[var].fillna(df[var].mode()[0])
+    df = impute(df)
+    df = label_encoding(df, CAT_VARS)
 
     df = df.drop(columns=['Name', 'Ticket', 'PassengerId'])
 
+    return df
+
+def impute(df, num='median', cat='mode'): #TODO: select method
+    # Impute
+    df['Age'] = df['Age'].fillna(df.groupby(['Alone', 'Sex', 'Pclass'])['Age'].transform('mean'))
+    for var in NUM_VARS:
+        df[var] = df[var].fillna(df[var].median())
+    for var in CAT_VARS:
+        df[var] = df[var].fillna(df[var].mode()[0])
+    return df
+
+def label_encoding(df, cols):
+    for col in cols:
+        df[col] = df[col].astype('category').cat.codes
     return df
 

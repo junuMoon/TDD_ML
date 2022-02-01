@@ -9,3 +9,6 @@ def load_dataset():
     df_train = pd.read_csv(raw_dir / 'train.csv')
     df_test = pd.read_csv(raw_dir / 'test.csv')
     return df_train, df_test
+
+CAT_VARS = ['Pclass', 'Sex', 'Embarked', 'Cabin', 'Alone', 'Title']
+NUM_VARS = ['Age', 'SibSp', 'Parch', 'Fare']

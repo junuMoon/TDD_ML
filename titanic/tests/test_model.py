@@ -1,22 +1,28 @@
 import pytest
+
 from src.uitls import submit_prediction
 from src.model import (ModelPredictAllDied,
-                        ModelPredictbySex)
+                        ModelPredictbySex,
+                        ModelSexPclassEmbarked)
 
-@pytest.mark.skip('already tested')
-def test_model_predict_all_died(test_data):
+def test_model_predict_all_died(dataset):
+    X_train, X_test, y_train, y_test = dataset
     model = ModelPredictAllDied()
-    test_sub = test_data.copy()
-    test_sub['Survived'] = model.predict()
-    acc = submit_prediction(test_sub, message='ModelPredictAllDied')
-    print(acc)
-    assert acc > 0.5
+    y_pred = model.predict(X_test)
+    acc = (y_pred == y_test).mean()
+    assert acc >= 0.5, f"{model.__class__.__name__} failed"
 
-def test_model_predict_by_sex(test_data):
+def test_model_predict_by_sex(dataset):
+    X_train, X_test, y_train, y_test = dataset
     model = ModelPredictbySex()
-    test_sub = test_data.copy()
-    test_sub['Survived'] = test_sub['Sex'].apply(lambda x: model.predict(x))
-    acc = submit_prediction(test_sub, message='ModelWomenSurvived')
-    print(acc)
-    assert acc > 0.7
+    y_pred = [model.predict(s) for s in X_test['Sex'].values]
+    acc = (y_pred == y_test).mean()
+    assert acc >= 0.6, f"{model.__class__.__name__} failed"
+
+def test_model_predict_by_sex_pclass_embarked(dataset):
+    X_train, X_test, y_train, y_test = dataset
+    model = ModelSexPclassEmbarked()
+    y_pred = [model.predict(*s) for s in zip(X_test['Sex'], X_test['Embarked'], X_test['Pclass'])]
+    acc = (y_pred == y_test).mean()
+    assert acc >= 0.7, f"{model.__class__.__name__} failed"
 

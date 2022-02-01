@@ -9,7 +9,6 @@ data_dir = path.absolute().parent / 'data'
 raw_dir = data_dir / 'raw'
 
 from src.preprocess import preprocess
-
 from sklearn.model_selection import train_test_split
 
 @pytest.fixture

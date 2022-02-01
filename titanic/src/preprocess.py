@@ -1,17 +1,18 @@
 from src import NUM_VARS, CAT_VARS
 
-def preprocess(df):
-    # Categorical variables
-    df['Alone'] = (df['SibSp'] + df['Parch']).apply(lambda x: 1 if x == 0 else 0)
+def preprocess(df, to_submit=False):
+    df['Relatives'] = df['SibSp'] + df['Parch']
+    df['Alone'] = df['Relatives'].apply(lambda x: 1 if x == 0 else 0)
     df['Cabin'] = df['Cabin'].apply(lambda c: c[0] if not isinstance(c, float) else 'U') # U for unknown
     for t in ['Mr', 'Miss', 'Mrs', 'Master']:
         df.loc[df['Name'].str.contains(t), 'Title'] = t
-    
     df = impute(df)
     df = label_encoding(df, CAT_VARS)
 
-    df = df.drop(columns=['Name', 'Ticket', 'PassengerId'])
-
+    if to_submit:
+        df = df.drop(columns=['Name', 'Ticket'])
+    else:
+        df = df.drop(columns=['Name', 'Ticket', 'PassengerId'])
     return df
 
 def impute(df, num='median', cat='mode'): #TODO: select method

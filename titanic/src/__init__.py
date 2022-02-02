@@ -11,3 +11,4 @@ def load_dataset():
     return df_train, df_test
 
 CAT_VARS = ['Pclass', 'Sex', 'Embarked', 'Cabin', 'Alone', 'Title']
+NUM_VARS = ['Age', 'SibSp', 'Parch', 'Fare']

@@ -75,6 +75,10 @@ def test_random_forest_drop_unimportant_feature(dataset):
     print(f"{model.__class__.__name__} oob score: {model.oob_score_}")
     assert score > score_orig, "Model trained with selected feature score is not better than original"
 
+
+def pytest_configure():
+    pytest.acc.base_model = 0.0
+
 @pytest.fixture
 def random_forest_best_param():
     return RandomForestClassifier(oob_score=True, **{'n_estimators': 400,
@@ -82,7 +86,7 @@ def random_forest_best_param():
                                 'min_samples_leaf': 1,
                                 'criterion': 'gini'})
 
-def test_best_rf_model(random_forest_best_param, dataset):
+def test_base_rf_model(random_forest_best_param, dataset):
     X_train, X_test, y_train, y_test = dataset
     model = random_forest_best_param
     model.fit(X_train, y_train)
@@ -90,3 +94,19 @@ def test_best_rf_model(random_forest_best_param, dataset):
     print(f"{model.__class__.__name__} score: {score}")
     print(f"{model.__class__.__name__} oob score: {model.oob_score_}")
     assert score > 0.8, f"{model.__class__.__name__} failed"
+    pytest_configure.base_model = score
+
+@pytest.fixture
+def age_categorization(train_data):
+    train_data['Age_bin'] = train_data['Age'].apply(lambda age: age // 10)
+    return train_data
+
+@pytest.mark.skip('No difference found')
+def test_age_categorization_improves_acc(random_forest_best_param, train_data, age_categorization, dataset):
+    X_train, X_test, y_train, y_test = dataset
+    model = random_forest_best_param
+    model.fit(X_train, y_train)
+    score = model.score(X_test, y_test)
+    print(f"{model.__class__.__name__} score: {score}")
+    print(f"{model.__class__.__name__} oob score: {model.oob_score_}")
+    assert score > pytest_configure.base_model, f"{model.__class__.__name__} failed"

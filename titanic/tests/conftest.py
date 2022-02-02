@@ -1,3 +1,4 @@
+import re
 import pytest
 from pathlib import Path
 import os
@@ -19,15 +20,15 @@ def cat_vars():
 def num_vars():
     return ['Age', 'SibSp', 'Parch', 'Fare']
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def train_data():
     return pd.read_csv(raw_dir / 'train.csv')
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def test_data():
     return pd.read_csv(raw_dir / 'test.csv')
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def dataset(train_data):
     dataset = preprocess(train_data)
     return train_test_split(dataset.drop(columns=['Survived']),

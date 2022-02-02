@@ -56,28 +56,27 @@ def test_various_model_performance(model, dataset):
     print(f"{model.__class__.__name__} score: {score}")
     assert score >= 0.7, f"{model.__class__.__name__} failed"
 
+def pytest_configure():
+    pytest.base_model = 0.0
+
+def test_base_model(dataset):
+    X_train, X_test, y_train, y_test = dataset
+    model = RandomForestClassifier(n_estimators=100, oob_score=True)
+    model.fit(X_train, y_train)
+    score = model.score(X_test, y_test)
+    assert score > 0.7, f"base model failed"
+    pytest_configure.base_model = score
+
 @pytest.mark.skip('No difference found')
 def test_random_forest_drop_unimportant_feature(dataset):
     X_train, X_test, y_train, y_test = dataset
-    model_orig = RandomForestClassifier(n_estimators=100, oob_score=True)
-    model_orig.fit(X_train, y_train)
-    score_orig = model_orig.score(X_test, y_test)
-    print(f"{model_orig.__class__.__name__} score: {score_orig}")
-    print(f"{model_orig.__class__.__name__} oob score: {model_orig.oob_score_}")
-    assert score_orig >= 0.8, f"{model_orig.__class__.__name__} failed"
-
     X_train = X_train.drop(columns=['Alone'])
     X_test = X_test.drop(columns=['Alone'])
     model = RandomForestClassifier(n_estimators=100, oob_score=True)
     model.fit(X_train, y_train)
     score = model.score(X_test, y_test)
-    print(f"{model.__class__.__name__} score: {score}")
-    print(f"{model.__class__.__name__} oob score: {model.oob_score_}")
-    assert score > score_orig, "Model trained with selected feature score is not better than original"
-
-
-def pytest_configure():
-    pytest.acc.base_model = 0.0
+    assert score > pytest_configure.base_model, "Model trained with selected feature score is not better than original"
+    pytest_configure.drop_model = score
 
 @pytest.fixture
 def random_forest_best_param():
@@ -86,15 +85,15 @@ def random_forest_best_param():
                                 'min_samples_leaf': 1,
                                 'criterion': 'gini'})
 
-def test_base_rf_model(random_forest_best_param, dataset):
+def test_best_rf_model(random_forest_best_param, dataset):
     X_train, X_test, y_train, y_test = dataset
     model = random_forest_best_param
     model.fit(X_train, y_train)
     score = model.score(X_test, y_test)
-    print(f"{model.__class__.__name__} score: {score}")
-    print(f"{model.__class__.__name__} oob score: {model.oob_score_}")
-    assert score > 0.8, f"{model.__class__.__name__} failed"
-    pytest_configure.base_model = score
+    assert score > pytest_configure.base_model, f"{model.__class__.__name__} failed"
+    pytest_configure.best_model = score
+    print(f"base: {pytest_configure.base_model}")
+    print(f"best: {pytest_configure.best_model}")
 
 @pytest.fixture
 def age_categorization(train_data):
@@ -107,6 +106,4 @@ def test_age_categorization_improves_acc(random_forest_best_param, train_data, a
     model = random_forest_best_param
     model.fit(X_train, y_train)
     score = model.score(X_test, y_test)
-    print(f"{model.__class__.__name__} score: {score}")
-    print(f"{model.__class__.__name__} oob score: {model.oob_score_}")
-    assert score > pytest_configure.base_model, f"{model.__class__.__name__} failed"
+    assert score > pytest_configure.best_model, f"{model.__class__.__name__} failed"

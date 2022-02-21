@@ -13,8 +13,10 @@ def preprocess(df, to_submit=False):
     else:
         df = df.drop(columns=['Name', 'Ticket', 'PassengerId'])
 
+
+    df = freq_encoding(df, CAT_VARS)
     df = impute(df)
-    df = label_encoding(df, CAT_VARS)
+    # df = label_encoding(df, CAT_VARS)
     return df
 
 def impute(df, num='median', cat='mode'): #TODO: select method
@@ -31,3 +33,8 @@ def label_encoding(df, cols):
         df[col] = df[col].astype('category').cat.codes
     return df
 
+def freq_encoding(df, cols):
+    for col in cols:
+        encoding = df.groupby(col).size() / df.shape[0]
+        df[col] = df[col].map(encoding)
+    return df

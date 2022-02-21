@@ -29,3 +29,16 @@
 - rec: 0.78
 - f1: 0.79
 - Kaggle score: 0.77990
+
+## XGBoost
+- No accuracy increase found in XGBoost Base/Tuned modle
+
+## TabNet
+- TabNet: Accuracy decreased in TabNet
+- Noteworthy, TabNet and RandomForest has quite different feature importances. 
+    - RF: Fare, age, Title, Sex, Pclass
+    - TabNet: Sex, Pclass, Title, Cabin, Relatives
+
+### Voting
+- AssertionError: Voting Classifier(soft) is not better than Random Forest(assert 0.7337278106508875 > 0.7486631016042781)
+- AssertionError: Voting Classifier(hard) is not better than Random Forest(assert 0.6164383561643835 > 0.7486631016042781)

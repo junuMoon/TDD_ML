@@ -1,3 +1,5 @@
+import numpy as np
+
 class ModelPredictAllDied:
     def predict(self, X):
         return 0
@@ -15,3 +17,17 @@ class ModelSexPclassEmbarked:
 
     def predict(self, sex, embarked, pclass):
         return self.sex[sex] + self.embarked[embarked] + self.pclass[pclass] >= 0
+
+class VotingClassifier:
+
+    def __init__(self, estimators) -> None:
+        self.estimators = estimators
+
+    def predict(self, X):
+        Y = np.zeros([X.shape[0], len(self.estimators)], dtype=int)
+        for i, clf in enumerate(self.estimators):
+            Y[:, i] = clf.predict(X)
+        y = np.zeros(X.shape[0], dtype=int)
+        for i in range(X.shape[0]):
+            y[i] = np.argmax(np.bincount(Y[i, :]))
+        return y

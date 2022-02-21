@@ -31,6 +31,6 @@ def test_data():
 @pytest.fixture
 def dataset(train_data):
     dataset = preprocess(train_data)
-    return train_test_split(dataset.drop(columns=['Survived']),
-                            dataset['Survived'],
-                             test_size=0.3, random_state=531)
+    return train_test_split(dataset.drop(columns=['Survived']).values,
+                            dataset['Survived'].values,
+                             test_size=0.25, random_state=531)

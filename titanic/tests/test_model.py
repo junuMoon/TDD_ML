@@ -1,3 +1,4 @@
+from statistics import LinearRegression
 import pytest
 
 from src.model import (ModelPredictAllDied,

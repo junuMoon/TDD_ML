@@ -37,3 +37,21 @@ class TestDecoder:
     def test_sequnce_forward(self):
         g = self.decoder(self.y)
         assert g.shape == self.decoder_output_shape
+
+def test_joiner():
+
+    x_seq_len = 10  # T
+    y_seq_len = 5  # U
+    num_vocab = 4  # V: {v1, v2, v3, v4}
+    encoder_dim = 64  # E
+    decoder_dim = 64  # D
+    joiner_dim = encoder_dim
+
+
+    joiner = Joiner(num_classes=num_vocab+1, joiner_dim=joiner_dim)
+    encoder_output = torch.rand(x_seq_len, encoder_dim)
+    decoder_output = torch.rand(y_seq_len+1, decoder_dim)
+    
+    joiner_output = joiner(encoder_output.unsqueeze(1), decoder_output.unsqueeze(0))  # unsqueeze to broadcast by T and U
+    assert joiner_output.shape == (x_seq_len, y_seq_len+1, num_vocab+1)  # (T, U+1, V+1)
+    assert joiner_output.softmax(-1)[0][0].sum().item() == pytest.approx(1.0)  # a row represents a distribution over V

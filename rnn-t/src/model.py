@@ -38,3 +38,12 @@ class Decoder(nn.Module):
             g.append(g_u)
         return torch.cat(g, dim=0)
 
+class Joiner(nn.Module):
+
+    def __init__(self, num_classes, joiner_dim) -> None:
+        super().__init__()
+        self.fc = nn.Linear(joiner_dim, num_classes)
+
+    def forward(self, f, g):
+        return self.fc(f+g)
+
